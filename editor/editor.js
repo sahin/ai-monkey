@@ -40,6 +40,25 @@ const toastEl = document.getElementById('toast');
 let scriptId = null; // null = new script
 let existingScript = null; // loaded script object for updates
 
+function getScriptBody(script) {
+  if (script?.rawText) {
+    return parseScript(script.rawText).body;
+  }
+  return script?.body || '';
+}
+
+function getScriptLocale(script) {
+  const result = detectLanguage(getScriptBody(script));
+  if (result.isEnglish) return 'en';
+  if (result.isTurkish) return 'tr';
+  return null;
+}
+
+async function applyPageLocale(localePreference) {
+  await initI18n(localePreference);
+  localizePage();
+}
+
 // ---------------------------------------------------------------------------
 // Toast
 // ---------------------------------------------------------------------------
@@ -323,6 +342,10 @@ async function init() {
   if (installData) {
     try {
       const shared = decodeSharePayload(installData);
+      const scriptLocale = getScriptLocale(shared);
+      if (scriptLocale) {
+        await applyPageLocale(scriptLocale);
+      }
       pageTitle.textContent = t('editorInstallScriptTitle');
       document.title = t('editorPageTitleInstall');
       populateForm({ metadata: shared.metadata, body: shared.body });
@@ -336,13 +359,17 @@ async function init() {
   }
 
   if (scriptId) {
-    pageTitle.textContent = t('editorEditScriptTitle');
-    document.title = t('editorPageTitleEdit');
     statusText.textContent = t('commonLoading');
 
     try {
       existingScript = await getScript(scriptId);
       if (existingScript) {
+        const scriptLocale = getScriptLocale(existingScript);
+        if (scriptLocale) {
+          await applyPageLocale(scriptLocale);
+        }
+        pageTitle.textContent = t('editorEditScriptTitle');
+        document.title = t('editorPageTitleEdit');
         populateForm(existingScript);
         statusText.textContent = t('editorStatusReady');
       } else {
