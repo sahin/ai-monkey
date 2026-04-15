@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-document-title="popupPageTitle">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,22 +14,28 @@
         <path d="M8 1L1 14h14L8 1z" stroke="#ef4444" stroke-width="1.5" fill="none"/>
         <path d="M8 6v3M8 11v1" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
-      <span>No API key configured.</span>
-      <a href="#" id="settings-link-warning">Set up in Settings</a>
+      <span data-i18n="popupWarningNoApiKey">No API key configured.</span>
+      <a href="#" id="settings-link-warning" data-i18n="popupWarningSettingsLink">Set up in Settings</a>
     </div>
 
     <!-- Header -->
     <header class="header">
       <div class="header-title">
         <span class="monkey-emoji">&#x1F435;</span>
-        <h1>AI Monkey</h1>
+        <h1 data-i18n="appName">AI Monkey</h1>
       </div>
-      <span id="script-count" class="script-count"></span>
+      <div class="header-controls">
+        <label class="language-picker">
+          <span class="sr-only" data-i18n="commonLanguageLabel">Language</span>
+          <select id="language-select" class="language-select" data-i18n-aria-label="popupLanguageAriaLabel" aria-label="Popup language"></select>
+        </label>
+        <span id="script-count" class="script-count"></span>
+      </div>
     </header>
 
     <!-- Scripts section -->
     <section class="scripts-section">
-      <h2 class="section-title">Scripts on this page</h2>
+      <h2 class="section-title" data-i18n="popupScriptsOnPage">Scripts on this page</h2>
       <div id="scripts-list" class="scripts-list">
         <!-- Rendered by JS -->
       </div>
@@ -39,7 +45,7 @@
           <polyline points="14 2 14 8 20 8"/>
           <line x1="9" y1="15" x2="15" y2="15"/>
         </svg>
-        <p>No scripts match this page</p>
+        <p data-i18n="popupNoScriptsMatch">No scripts match this page</p>
       </div>
     </section>
 
@@ -55,20 +61,20 @@
           <rect x="3" y="14" width="7" height="7" rx="1"/>
           <rect x="14" y="14" width="7" height="7" rx="1"/>
         </svg>
-        Dashboard
+        <span data-i18n="navDashboard">Dashboard</span>
       </a>
       <a href="#" class="footer-link" data-page="editor/editor.html">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14"/>
         </svg>
-        New Script
+        <span data-i18n="navNewScript">New Script</span>
       </a>
       <a href="#" class="footer-link" data-page="settings/settings.html">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
         </svg>
-        Settings
+        <span data-i18n="navSettings">Settings</span>
       </a>
       <a href="#" class="footer-link" data-page="logs/logs.html">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -78,7 +84,7 @@
           <line x1="16" y1="17" x2="8" y2="17"/>
           <polyline points="10 9 9 9 8 9"/>
         </svg>
-        Logs
+        <span data-i18n="navLogs">Logs</span>
       </a>
     </footer>
   </div>

@@ -4,8 +4,9 @@
  * Loads, renders, searches, and manages all user scripts.
  */
 
-import { getScripts, saveScript, deleteScript, toggleScript } from '../lib/storage.js';
+import { getScripts, getSettings, saveScript, deleteScript, toggleScript } from '../lib/storage.js';
 import { encodeShareUrl } from '../lib/share.js';
+import { formatCount, initI18n, localizePage, t } from '../lib/i18n.js';
 
 // ---------------------------------------------------------------------------
 // DOM references
@@ -22,7 +23,9 @@ const importBtn = document.getElementById('import-btn');
 const exportBtn = document.getElementById('export-btn');
 const importFile = document.getElementById('import-file');
 const deleteModal = document.getElementById('delete-modal');
+const deleteBodyPrefix = document.getElementById('delete-body-prefix');
 const deleteScriptName = document.getElementById('delete-script-name');
+const deleteBodySuffix = document.getElementById('delete-body-suffix');
 const deleteCancelBtn = document.getElementById('delete-cancel');
 const deleteConfirmBtn = document.getElementById('delete-confirm');
 const toastEl = document.getElementById('toast');
@@ -84,7 +87,7 @@ async function openEditor(id) {
 // ---------------------------------------------------------------------------
 
 function getScriptName(script) {
-  return script.metadata?.name || script.name || 'Untitled Script';
+  return script.metadata?.name || script.name || t('commonUntitledScript');
 }
 
 function getScriptDescription(script) {
@@ -130,7 +133,7 @@ function renderScriptCard(script) {
       script.enabled = newState;
     } catch {
       checkbox.checked = !checkbox.checked;
-      showToast('Failed to toggle script', 'error');
+      showToast(t('dashboardToggleFailed'), 'error');
     }
   });
   const slider = document.createElement('span');
@@ -174,7 +177,11 @@ function renderScriptCard(script) {
   const dot = document.createElement('span');
   dot.className = `status-dot ${status}`;
   const statusText = document.createElement('span');
-  statusText.textContent = status === 'success' ? 'Last run OK' : status === 'error' ? 'Last run failed' : 'Not run yet';
+  statusText.textContent = status === 'success'
+    ? t('dashboardStatusSuccess')
+    : status === 'error'
+      ? t('dashboardStatusError')
+      : t('dashboardStatusIdle');
   statusEl.appendChild(dot);
   statusEl.appendChild(statusText);
 
@@ -184,30 +191,30 @@ function renderScriptCard(script) {
   // Share button
   const shareBtn = document.createElement('button');
   shareBtn.className = 'btn-icon';
-  shareBtn.title = 'Copy share link';
+  shareBtn.title = t('dashboardCopyShareLink');
   shareBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
   shareBtn.addEventListener('click', async () => {
     try {
       const encoded = encodeShareUrl(script);
       const shareUrl = chrome.runtime.getURL(`editor/editor.html?install=${encoded}`);
       await navigator.clipboard.writeText(shareUrl);
-      showToast('Share link copied to clipboard');
+      showToast(t('dashboardShareCopied'));
     } catch {
-      showToast('Failed to copy share link', 'error');
+      showToast(t('dashboardShareCopyFailed'), 'error');
     }
   });
 
   // Edit button
   const editBtn = document.createElement('button');
   editBtn.className = 'btn-icon';
-  editBtn.title = 'Edit script';
+  editBtn.title = t('dashboardEditScript');
   editBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
   editBtn.addEventListener('click', () => openEditor(script.id));
 
   // Delete button
   const delBtn = document.createElement('button');
   delBtn.className = 'btn-icon danger';
-  delBtn.title = 'Delete script';
+  delBtn.title = t('dashboardDeleteScript');
   delBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
   delBtn.addEventListener('click', () => showDeleteModal(script.id, name));
 
@@ -237,7 +244,7 @@ function renderScripts(filter = '') {
     : scripts;
 
   // Update count
-  scriptCountEl.textContent = `${scripts.length} script${scripts.length !== 1 ? 's' : ''}`;
+  scriptCountEl.textContent = formatCount(scripts.length, 'commonScriptCountOne', 'commonScriptCountOther');
 
   if (scripts.length === 0) {
     emptyState.hidden = false;
@@ -273,7 +280,9 @@ function renderScripts(filter = '') {
 
 function showDeleteModal(id, name) {
   pendingDeleteId = id;
+  deleteBodyPrefix.textContent = t('dashboardDeleteBodyPrefix');
   deleteScriptName.textContent = name;
+  deleteBodySuffix.textContent = t('dashboardDeleteBodySuffix');
   deleteModal.hidden = false;
 }
 
@@ -295,9 +304,9 @@ deleteConfirmBtn.addEventListener('click', async () => {
     delete allScripts[pendingDeleteId];
     hideDeleteModal();
     renderScripts(searchInput.value);
-    showToast('Script deleted');
+    showToast(t('dashboardDeleted'));
   } catch {
-    showToast('Failed to delete script', 'error');
+    showToast(t('dashboardDeleteFailed'), 'error');
     hideDeleteModal();
   }
 });
@@ -324,7 +333,7 @@ emptyCreateBtn.addEventListener('click', () => openEditor());
 exportBtn.addEventListener('click', () => {
   const scripts = Object.values(allScripts);
   if (scripts.length === 0) {
-    showToast('No scripts to export', 'error');
+    showToast(t('dashboardNoScriptsToExport'), 'error');
     return;
   }
 
@@ -340,7 +349,7 @@ exportBtn.addEventListener('click', () => {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  showToast(`Exported ${scripts.length} script${scripts.length !== 1 ? 's' : ''}`);
+  showToast(formatCount(scripts.length, 'dashboardExportedScriptsOne', 'dashboardExportedScriptsOther'));
 });
 
 // ---------------------------------------------------------------------------
@@ -360,7 +369,7 @@ importFile.addEventListener('change', async (e) => {
     const scripts = JSON.parse(text);
 
     if (!Array.isArray(scripts)) {
-      throw new Error('Invalid format: expected an array of scripts');
+      throw new Error(t('dashboardImportInvalidFormat'));
     }
 
     let count = 0;
@@ -372,9 +381,9 @@ importFile.addEventListener('change', async (e) => {
     }
 
     renderScripts(searchInput.value);
-    showToast(`Imported ${count} script${count !== 1 ? 's' : ''}`);
+    showToast(formatCount(count, 'dashboardImportedScriptsOne', 'dashboardImportedScriptsOther'));
   } catch (err) {
-    showToast(`Import failed: ${err.message}`, 'error');
+    showToast(t('dashboardImportFailed', [err.message]), 'error');
   }
 
   // Reset file input so re-importing the same file triggers change
@@ -400,10 +409,14 @@ document.querySelectorAll('.nav-link[data-page]').forEach((link) => {
 
 async function init() {
   try {
+    const settings = await getSettings();
+    await initI18n(settings.locale);
+    localizePage();
+
     allScripts = await getScripts();
     renderScripts();
   } catch (err) {
-    showToast('Failed to load scripts', 'error');
+    showToast(t('dashboardLoadFailed'), 'error');
   }
 }
 

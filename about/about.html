@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-document-title="aboutPageTitle">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,41 +11,41 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <a href="#" id="back-link" class="back-link" title="Back to Dashboard">&lsaquo;</a>
+        <a href="#" id="back-link" class="back-link" data-i18n-title="commonBackToDashboard" title="Back to Dashboard">&lsaquo;</a>
         <span class="monkey-emoji">&#x1F435;</span>
-        <h1>AI Monkey</h1>
+        <h1 data-i18n="appName">AI Monkey</h1>
         <span class="version-badge">v0.2.0</span>
       </div>
     </header>
 
     <!-- Tab navigation -->
     <nav class="tabs">
-      <button class="tab active" data-tab="features">Features</button>
-      <button class="tab" data-tab="changelog">Changelog</button>
-      <button class="tab" data-tab="roadmap">Roadmap</button>
+      <button class="tab active" data-tab="features" data-i18n="aboutFeaturesTab">Features</button>
+      <button class="tab" data-tab="changelog" data-i18n="aboutChangelogTab">Changelog</button>
+      <button class="tab" data-tab="roadmap" data-i18n="aboutRoadmapTab">Roadmap</button>
     </nav>
 
     <!-- Features tab -->
     <main id="tab-features" class="tab-content active">
-      <p class="tab-intro">AI Monkey lets you automate any website with plain English. No code required.</p>
+      <p class="tab-intro" data-i18n="aboutIntro">AI Monkey lets you automate any website with plain English. No code required.</p>
 
       <section class="feature-group">
-        <h2 class="group-title">Core Engine</h2>
+        <h2 class="group-title" data-i18n="aboutCoreEngine">Core Engine</h2>
         <div class="feature-list" id="features-core"></div>
       </section>
 
       <section class="feature-group">
-        <h2 class="group-title">Multi-Provider LLM</h2>
+        <h2 class="group-title" data-i18n="aboutMultiProvider">Multi-Provider LLM</h2>
         <div class="feature-list" id="features-llm"></div>
       </section>
 
       <section class="feature-group">
-        <h2 class="group-title">Script Management</h2>
+        <h2 class="group-title" data-i18n="aboutScriptManagement">Script Management</h2>
         <div class="feature-list" id="features-management"></div>
       </section>
 
       <section class="feature-group">
-        <h2 class="group-title">UI & UX</h2>
+        <h2 class="group-title" data-i18n="aboutUiUx">UI & UX</h2>
         <div class="feature-list" id="features-ui"></div>
       </section>
 
@@ -59,7 +59,7 @@
 
     <!-- Roadmap tab -->
     <main id="tab-roadmap" class="tab-content">
-      <p class="tab-intro">What's coming next for AI Monkey.</p>
+      <p class="tab-intro" data-i18n="aboutRoadmapIntro">What's coming next for AI Monkey.</p>
       <div class="roadmap" id="roadmap"></div>
     </main>
   </div>

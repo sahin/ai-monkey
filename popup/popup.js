@@ -5,8 +5,9 @@
  * and provides navigation to extension pages.
  */
 
-import { getScripts, getSettings, toggleScript } from '../lib/storage.js';
+import { getScripts, getSettings, saveSettings, toggleScript } from '../lib/storage.js';
 import { matchesUrl } from '../lib/matcher.js';
+import { formatCount, initI18n, localizePage, t } from '../lib/i18n.js';
 
 // ---------------------------------------------------------------------------
 // DOM references
@@ -18,6 +19,7 @@ const scriptCount = document.getElementById('script-count');
 const apiKeyWarning = document.getElementById('api-key-warning');
 const settingsLinkWarning = document.getElementById('settings-link-warning');
 const toastEl = document.getElementById('toast');
+const languageSelect = document.getElementById('language-select');
 
 // ---------------------------------------------------------------------------
 // Toast helper
@@ -52,6 +54,23 @@ function openExtensionPage(path) {
   chrome.tabs.create({ url });
 }
 
+function populateLocaleOptions(selectedLocale) {
+  const options = [
+    { value: 'auto', label: t('commonLanguageAuto') },
+    { value: 'en', label: t('commonLanguageEnglish') },
+    { value: 'tr', label: t('commonLanguageTurkish') }
+  ];
+
+  languageSelect.innerHTML = '';
+  for (const option of options) {
+    const el = document.createElement('option');
+    el.value = option.value;
+    el.textContent = option.label;
+    el.selected = option.value === selectedLocale;
+    languageSelect.appendChild(el);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Render a single script row
 // ---------------------------------------------------------------------------
@@ -66,12 +85,12 @@ function renderScriptRow(script, tabId) {
 
   const name = document.createElement('div');
   name.className = 'script-name';
-  name.textContent = script.metadata?.name || script.name || 'Untitled Script';
+  name.textContent = script.metadata?.name || script.name || t('commonUntitledScript');
 
   const pattern = document.createElement('div');
   pattern.className = 'script-pattern';
   const sites = script.metadata?.match || [];
-  pattern.textContent = sites[0] || 'No sites specified';
+  pattern.textContent = sites[0] || t('commonNoSitesSpecified');
 
   info.appendChild(name);
   info.appendChild(pattern);
@@ -89,7 +108,7 @@ function renderScriptRow(script, tabId) {
       checkbox.checked = newState;
     } catch (err) {
       checkbox.checked = !checkbox.checked;
-      showToast('Failed to toggle script', 'error');
+      showToast(t('popupToggleFailed'), 'error');
     }
   });
 
@@ -102,10 +121,10 @@ function renderScriptRow(script, tabId) {
   // Run button
   const runBtn = document.createElement('button');
   runBtn.className = 'btn-run';
-  runBtn.textContent = 'Run';
+  runBtn.textContent = t('popupRun');
   runBtn.addEventListener('click', async () => {
     runBtn.disabled = true;
-    runBtn.textContent = '...';
+    runBtn.textContent = t('popupRunning');
     try {
       const response = await chrome.runtime.sendMessage({
         type: 'RUN_SCRIPT',
@@ -116,13 +135,13 @@ function renderScriptRow(script, tabId) {
       if (response?.error) {
         showToast(response.error, 'error');
       } else {
-        showToast('Script executed successfully', 'success');
+        showToast(t('popupRunSuccess'), 'success');
       }
     } catch (err) {
-      showToast('Failed to run script', 'error');
+      showToast(t('popupRunFailed'), 'error');
     } finally {
       runBtn.disabled = false;
-      runBtn.textContent = 'Run';
+      runBtn.textContent = t('popupRun');
     }
   });
 
@@ -138,16 +157,17 @@ function renderScriptRow(script, tabId) {
 // ---------------------------------------------------------------------------
 
 async function init() {
+  const settings = await getSettings();
+  await initI18n(settings.locale);
+  localizePage();
+  populateLocaleOptions(settings.locale || 'auto');
+
   // Get the active tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const currentUrl = tab?.url || '';
   const tabId = tab?.id;
 
-  // Load scripts and settings in parallel
-  const [scriptsObj, settings] = await Promise.all([
-    getScripts(),
-    getSettings()
-  ]);
+  const scriptsObj = await getScripts();
 
   const allScripts = Object.values(scriptsObj);
 
@@ -158,7 +178,7 @@ async function init() {
 
   // Show total count
   const totalCount = allScripts.length;
-  scriptCount.textContent = `${totalCount} script${totalCount !== 1 ? 's' : ''} total`;
+  scriptCount.textContent = formatCount(totalCount, 'popupScriptCountTotalOne', 'popupScriptCountTotalOther');
 
   // Find matching scripts (include disabled ones in the popup so users can toggle them)
   const matchingScripts = allScripts.filter((script) => {
@@ -198,6 +218,11 @@ async function init() {
   settingsLinkWarning.addEventListener('click', (e) => {
     e.preventDefault();
     openExtensionPage('settings/settings.html');
+  });
+
+  languageSelect.addEventListener('change', async () => {
+    await saveSettings({ locale: languageSelect.value });
+    window.location.reload();
   });
 }
 

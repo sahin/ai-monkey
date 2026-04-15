@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "AI Monkey",
+  "name": "__MSG_extName__",
   "version": "0.2.0",
-  "description": "Run English-language scripts on any webpage, powered by AI",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "permissions": [
     "storage",
     "activeTab",

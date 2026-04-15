@@ -14,6 +14,7 @@ import {
   clearCache,
   DEFAULT_SETTINGS
 } from '../lib/storage.js';
+import { formatCount, initI18n, localizePage, t } from '../lib/i18n.js';
 
 // ---------------------------------------------------------------------------
 // Provider & model configuration
@@ -23,45 +24,45 @@ const PROVIDERS = {
   openai: {
     name: 'OpenAI',
     models: [
-      { id: 'gpt-4o', name: 'GPT-4o', desc: 'Fast & smart, best value', default: true },
-      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', desc: 'Fastest, cheapest' },
-      { id: 'gpt-4.1', name: 'GPT-4.1', desc: 'Latest flagship model' },
-      { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', desc: 'Compact latest model' },
-      { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', desc: 'Smallest, fastest' },
-      { id: 'o3', name: 'o3', desc: 'Reasoning model' },
-      { id: 'o4-mini', name: 'o4-mini', desc: 'Fast reasoning' },
+      { id: 'gpt-4o', name: 'GPT-4o', descKey: 'settingsModelDescBestValue', default: true },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', descKey: 'settingsModelDescFastestCheapest' },
+      { id: 'gpt-4.1', name: 'GPT-4.1', descKey: 'settingsModelDescLatestFlagship' },
+      { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', descKey: 'settingsModelDescCompactLatest' },
+      { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', descKey: 'settingsModelDescSmallestFastest' },
+      { id: 'o3', name: 'o3', descKey: 'settingsModelDescReasoning' },
+      { id: 'o4-mini', name: 'o4-mini', descKey: 'settingsModelDescFastReasoning' },
     ]
   },
   anthropic: {
     name: 'Anthropic',
     models: [
-      { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', desc: 'Best balance of speed & quality', default: true },
-      { id: 'claude-opus-4-20250514', name: 'Claude Opus 4', desc: 'Most capable' },
-      { id: 'claude-haiku-3-5-20241022', name: 'Claude Haiku 3.5', desc: 'Fastest, cheapest' },
+      { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', descKey: 'settingsModelDescBestBalance', default: true },
+      { id: 'claude-opus-4-20250514', name: 'Claude Opus 4', descKey: 'settingsModelDescMostCapable' },
+      { id: 'claude-haiku-3-5-20241022', name: 'Claude Haiku 3.5', descKey: 'settingsModelDescFastestCheapest' },
     ]
   },
   google: {
     name: 'Google',
     models: [
-      { id: 'gemini-2.5-pro-preview-05-06', name: 'Gemini 2.5 Pro', desc: 'Most capable', default: true },
-      { id: 'gemini-2.5-flash-preview-04-17', name: 'Gemini 2.5 Flash', desc: 'Fast & efficient' },
-      { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', desc: 'Previous gen fast' },
+      { id: 'gemini-2.5-pro-preview-05-06', name: 'Gemini 2.5 Pro', descKey: 'settingsModelDescMostCapable', default: true },
+      { id: 'gemini-2.5-flash-preview-04-17', name: 'Gemini 2.5 Flash', descKey: 'settingsModelDescGoogleFastEfficient' },
+      { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', descKey: 'settingsModelDescPreviousGenFast' },
     ]
   },
   groq: {
     name: 'Groq',
     models: [
-      { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', desc: 'Best open model', default: true },
-      { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', desc: 'Ultra fast' },
-      { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', desc: 'Fast MoE model' },
+      { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', descKey: 'settingsModelDescBestOpenModel', default: true },
+      { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', descKey: 'settingsModelDescUltraFast' },
+      { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', descKey: 'settingsModelDescFastMoe' },
     ]
   },
   openrouter: {
     name: 'OpenRouter',
     models: [
-      { id: 'openai/gpt-4o', name: 'GPT-4o (via OR)', desc: 'Routes to OpenAI', default: true },
-      { id: 'anthropic/claude-sonnet-4-20250514', name: 'Sonnet 4 (via OR)', desc: 'Routes to Anthropic' },
-      { id: 'google/gemini-2.5-pro-preview-05-06', name: 'Gemini 2.5 Pro (via OR)', desc: 'Routes to Google' },
+      { id: 'openai/gpt-4o', name: 'GPT-4o (via OR)', descKey: 'settingsModelDescRoutesToOpenAI', default: true },
+      { id: 'anthropic/claude-sonnet-4-20250514', name: 'Sonnet 4 (via OR)', descKey: 'settingsModelDescRoutesToAnthropic' },
+      { id: 'google/gemini-2.5-pro-preview-05-06', name: 'Gemini 2.5 Pro (via OR)', descKey: 'settingsModelDescRoutesToGoogle' },
     ]
   },
 };
@@ -70,6 +71,7 @@ const PROVIDERS = {
 // DOM references
 // ---------------------------------------------------------------------------
 
+const localeEl = document.getElementById('locale');
 const providerEl = document.getElementById('provider');
 const modelEl = document.getElementById('model');
 const customModelGroup = document.getElementById('custom-model-group');
@@ -96,6 +98,7 @@ const confirmTitle = document.getElementById('confirm-title');
 const confirmBody = document.getElementById('confirm-body');
 const confirmCancel = document.getElementById('confirm-cancel');
 const confirmOk = document.getElementById('confirm-ok');
+let refreshGdriveUI = null;
 
 // ---------------------------------------------------------------------------
 // Toast
@@ -164,6 +167,23 @@ function populateProviders(selectedProvider) {
   }
 }
 
+function populateLocaleOptions(selectedLocale) {
+  const options = [
+    { value: 'auto', label: t('commonLanguageAuto') },
+    { value: 'en', label: t('commonLanguageEnglish') },
+    { value: 'tr', label: t('commonLanguageTurkish') }
+  ];
+
+  localeEl.innerHTML = '';
+  for (const option of options) {
+    const opt = document.createElement('option');
+    opt.value = option.value;
+    opt.textContent = option.label;
+    opt.selected = option.value === selectedLocale;
+    localeEl.appendChild(opt);
+  }
+}
+
 function populateModels(providerKey, selectedModelId) {
   const provider = PROVIDERS[providerKey];
   if (!provider) return;
@@ -175,7 +195,7 @@ function populateModels(providerKey, selectedModelId) {
   for (const model of provider.models) {
     const opt = document.createElement('option');
     opt.value = model.id;
-    opt.textContent = `${model.name}  \u2014  ${model.desc}`;
+    opt.textContent = `${model.name}  \u2014  ${t(model.descKey)}`;
     if (model.id === selectedModelId) {
       opt.selected = true;
       hasMatch = true;
@@ -186,7 +206,7 @@ function populateModels(providerKey, selectedModelId) {
   // Add custom option
   const customOpt = document.createElement('option');
   customOpt.value = '__custom__';
-  customOpt.textContent = 'Custom model...';
+  customOpt.textContent = t('settingsCustomModelOption');
   modelEl.appendChild(customOpt);
 
   // If the saved model doesn't match any known model, select custom
@@ -234,6 +254,12 @@ providerEl.addEventListener('change', () => {
   customModelEl.value = '';
 });
 
+localeEl.addEventListener('change', async () => {
+  const locale = localeEl.value;
+  await saveSettings({ locale });
+  await applyLocale(locale, { showToastMessage: true });
+});
+
 // ---------------------------------------------------------------------------
 // Event: model change
 // ---------------------------------------------------------------------------
@@ -255,29 +281,56 @@ modelEl.addEventListener('change', () => {
 async function loadForm() {
   const settings = await getSettings();
 
+  populateLocaleOptions(settings.locale || 'auto');
   populateProviders(settings.provider || 'openai');
   populateModels(settings.provider || 'openai', settings.model);
 
   apiKeyEl.value = settings.apiKey || '';
   defaultRunAtEl.value = settings.defaultRunAt || 'document-idle';
   cacheEnabledEl.checked = settings.cacheEnabled !== false;
+  localeEl.value = settings.locale || 'auto';
   updateCacheLabel();
 
   await updateCounts();
 }
 
 function updateCacheLabel() {
-  cacheLabel.textContent = cacheEnabledEl.checked ? 'Enabled' : 'Disabled';
+  cacheLabel.textContent = cacheEnabledEl.checked ? t('settingsCacheEnabledOn') : t('settingsCacheEnabledOff');
 }
 
 async function updateCounts() {
   const result = await chrome.storage.local.get('cache');
   const cache = result.cache || {};
   const cacheCount = Object.keys(cache).length;
-  cacheCountEl.textContent = `${cacheCount} ${cacheCount === 1 ? 'entry' : 'entries'}`;
+  cacheCountEl.textContent = formatCount(cacheCount, 'commonEntryCountOne', 'commonEntryCountOther');
 
   const logs = await getLogs();
-  logCountEl.textContent = `${logs.length} ${logs.length === 1 ? 'entry' : 'entries'}`;
+  logCountEl.textContent = formatCount(logs.length, 'commonEntryCountOne', 'commonEntryCountOther');
+}
+
+function setButtonLabel(button, key) {
+  const label = button.querySelector('span');
+  if (label) {
+    label.dataset.i18n = key;
+    label.textContent = t(key);
+  } else {
+    button.textContent = t(key);
+  }
+}
+
+async function applyLocale(localePreference, { showToastMessage = false } = {}) {
+  const selectedModelId = getSelectedModelId();
+  await initI18n(localePreference);
+  localizePage();
+  populateLocaleOptions(localePreference);
+  populateModels(providerEl.value, selectedModelId);
+  updateCacheLabel();
+  if (refreshGdriveUI) {
+    await refreshGdriveUI();
+  }
+  if (showToastMessage) {
+    showToast(t('commonLanguageChanged'));
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -308,13 +361,13 @@ testBtn.addEventListener('click', async () => {
 
   if (!apiKey) {
     testResult.className = 'test-result error';
-    testResult.innerHTML = '<span class="result-icon">&#x2717;</span> API key is required';
+    testResult.innerHTML = `<span class="result-icon">&#x2717;</span> ${t('settingsApiKeyRequired')}`;
     return;
   }
 
   testBtn.disabled = true;
   testResult.className = 'test-result';
-  testResult.textContent = 'Testing...';
+  testResult.textContent = t('settingsTesting');
 
   try {
     switch (provider) {
@@ -324,7 +377,7 @@ testBtn.addEventListener('click', async () => {
         });
         if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `HTTP ${resp.status}`);
         testResult.className = 'test-result success';
-        testResult.innerHTML = '<span class="result-icon">&#x2713;</span> Connected to OpenAI';
+        testResult.innerHTML = `<span class="result-icon">&#x2713;</span> ${t('settingsConnectedToOpenAI')}`;
         break;
       }
       case 'anthropic': {
@@ -340,14 +393,14 @@ testBtn.addEventListener('click', async () => {
         });
         if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `HTTP ${resp.status}`);
         testResult.className = 'test-result success';
-        testResult.innerHTML = '<span class="result-icon">&#x2713;</span> Connected to Anthropic';
+        testResult.innerHTML = `<span class="result-icon">&#x2713;</span> ${t('settingsConnectedToAnthropic')}`;
         break;
       }
       case 'google': {
         const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
         if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `HTTP ${resp.status}`);
         testResult.className = 'test-result success';
-        testResult.innerHTML = '<span class="result-icon">&#x2713;</span> Connected to Google';
+        testResult.innerHTML = `<span class="result-icon">&#x2713;</span> ${t('settingsConnectedToGoogle')}`;
         break;
       }
       case 'groq': {
@@ -356,7 +409,7 @@ testBtn.addEventListener('click', async () => {
         });
         if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `HTTP ${resp.status}`);
         testResult.className = 'test-result success';
-        testResult.innerHTML = '<span class="result-icon">&#x2713;</span> Connected to Groq';
+        testResult.innerHTML = `<span class="result-icon">&#x2713;</span> ${t('settingsConnectedToGroq')}`;
         break;
       }
       case 'openrouter': {
@@ -365,7 +418,7 @@ testBtn.addEventListener('click', async () => {
         });
         if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).error?.message || `HTTP ${resp.status}`);
         testResult.className = 'test-result success';
-        testResult.innerHTML = '<span class="result-icon">&#x2713;</span> Connected to OpenRouter';
+        testResult.innerHTML = `<span class="result-icon">&#x2713;</span> ${t('settingsConnectedToOpenRouter')}`;
         break;
       }
       default:
@@ -398,7 +451,7 @@ saveBtn.addEventListener('click', async () => {
     cacheEnabled
   });
 
-  showToast('Settings saved');
+  showToast(t('settingsSaved'));
 });
 
 // ---------------------------------------------------------------------------
@@ -408,7 +461,7 @@ saveBtn.addEventListener('click', async () => {
 clearCacheBtn.addEventListener('click', async () => {
   await clearCache();
   await updateCounts();
-  showToast('Cache cleared');
+  showToast(t('settingsCacheCleared'));
 });
 
 // ---------------------------------------------------------------------------
@@ -418,7 +471,7 @@ clearCacheBtn.addEventListener('click', async () => {
 clearLogsBtn.addEventListener('click', async () => {
   await clearLogs();
   await updateCounts();
-  showToast('Logs cleared');
+  showToast(t('settingsLogsCleared'));
 });
 
 // ---------------------------------------------------------------------------
@@ -430,7 +483,7 @@ exportBtn.addEventListener('click', async () => {
   const scriptList = Object.values(scripts);
 
   if (scriptList.length === 0) {
-    showToast('No scripts to export', 'error');
+    showToast(t('settingsNoScriptsToExport'), 'error');
     return;
   }
 
@@ -441,7 +494,7 @@ exportBtn.addEventListener('click', async () => {
   a.download = `ai-monkey-scripts-${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast(`Exported ${scriptList.length} script${scriptList.length === 1 ? '' : 's'}`);
+  showToast(formatCount(scriptList.length, 'settingsExportedScriptsOne', 'settingsExportedScriptsOther'));
 });
 
 // ---------------------------------------------------------------------------
@@ -450,15 +503,15 @@ exportBtn.addEventListener('click', async () => {
 
 resetBtn.addEventListener('click', async () => {
   const confirmed = await showConfirm(
-    'Reset Settings',
-    'This will reset all settings to their defaults. Your scripts and logs will not be affected. Continue?'
+    t('settingsResetConfirmTitle'),
+    t('settingsResetConfirmBody')
   );
 
   if (!confirmed) return;
 
   await saveSettings({ ...DEFAULT_SETTINGS });
   await loadForm();
-  showToast('Settings reset to defaults');
+  showToast(t('settingsResetSuccess'));
 });
 
 // ---------------------------------------------------------------------------
@@ -481,8 +534,8 @@ async function initGdrive() {
     async function updateGdriveUI() {
       const signedIn = await gdrive.isSignedIn();
       if (signedIn) {
-        gdriveStatus.textContent = 'Connected';
-        gdriveConnectBtn.textContent = 'Connected';
+        gdriveStatus.textContent = t('settingsConnected');
+        setButtonLabel(gdriveConnectBtn, 'settingsConnected');
         gdriveConnectBtn.disabled = true;
         gdriveBackupBtn.disabled = false;
         gdriveRestoreBtn.disabled = false;
@@ -490,75 +543,77 @@ async function initGdrive() {
         const info = await gdrive.getBackupInfo();
         gdriveLastBackup.textContent = info.exists && info.modifiedTime
           ? new Date(info.modifiedTime).toLocaleString()
-          : 'No backup yet';
+          : t('settingsNoBackupYet');
       } else {
-        gdriveStatus.textContent = 'Not connected';
-        gdriveConnectBtn.textContent = 'Connect Google Drive';
+        gdriveStatus.textContent = t('settingsNotConnected');
+        setButtonLabel(gdriveConnectBtn, 'settingsConnectGoogleDrive');
         gdriveConnectBtn.disabled = false;
         gdriveBackupBtn.disabled = true;
         gdriveRestoreBtn.disabled = true;
         gdriveDisconnectBtn.disabled = true;
-        gdriveLastBackup.textContent = 'Never';
+        gdriveLastBackup.textContent = t('settingsNever');
       }
     }
+
+    refreshGdriveUI = updateGdriveUI;
 
     gdriveConnectBtn.addEventListener('click', async () => {
       try {
         gdriveConnectBtn.disabled = true;
-        gdriveConnectBtn.textContent = 'Connecting...';
+        setButtonLabel(gdriveConnectBtn, 'settingsConnecting');
         await gdrive.getAuthToken(true);
-        showToast('Connected to Google Drive');
+        showToast(t('settingsConnectSuccess'));
         await updateGdriveUI();
       } catch (err) {
-        showToast(`Failed to connect: ${err.message}`, 'error');
+        showToast(t('settingsConnectFailed', [err.message]), 'error');
         gdriveConnectBtn.disabled = false;
-        gdriveConnectBtn.textContent = 'Connect Google Drive';
+        setButtonLabel(gdriveConnectBtn, 'settingsConnectGoogleDrive');
       }
     });
 
     gdriveBackupBtn.addEventListener('click', async () => {
       gdriveBackupBtn.disabled = true;
-      gdriveBackupBtn.textContent = 'Backing up...';
+      setButtonLabel(gdriveBackupBtn, 'settingsBackingUp');
       try {
         const scripts = await getScripts();
         const result = await gdrive.backupToDrive(scripts);
-        showToast('Backup complete');
+        showToast(t('settingsBackupComplete'));
         if (result.modifiedTime) gdriveLastBackup.textContent = new Date(result.modifiedTime).toLocaleString();
       } catch (err) {
-        showToast(`Backup failed: ${err.message}`, 'error');
+        showToast(t('settingsBackupFailed', [err.message]), 'error');
       } finally {
         gdriveBackupBtn.disabled = false;
-        gdriveBackupBtn.textContent = 'Backup Now';
+        setButtonLabel(gdriveBackupBtn, 'settingsBackupNow');
       }
     });
 
     gdriveRestoreBtn.addEventListener('click', async () => {
-      const confirmed = await showConfirm('Restore from Backup', 'This will import scripts from your Google Drive backup. Existing scripts with matching IDs will be overwritten. Continue?');
+      const confirmed = await showConfirm(t('settingsRestoreConfirmTitle'), t('settingsRestoreConfirmBody'));
       if (!confirmed) return;
       gdriveRestoreBtn.disabled = true;
-      gdriveRestoreBtn.textContent = 'Restoring...';
+      setButtonLabel(gdriveRestoreBtn, 'settingsRestoring');
       try {
         const scripts = await gdrive.restoreFromDrive();
         let count = 0;
         for (const script of scripts) { await saveScript(script); count++; }
-        showToast(`Restored ${count} script${count !== 1 ? 's' : ''}`);
+        showToast(formatCount(count, 'settingsRestoredScriptsOne', 'settingsRestoredScriptsOther'));
       } catch (err) {
-        showToast(`Restore failed: ${err.message}`, 'error');
+        showToast(t('settingsRestoreFailed', [err.message]), 'error');
       } finally {
         gdriveRestoreBtn.disabled = false;
-        gdriveRestoreBtn.textContent = 'Restore from Backup';
+        setButtonLabel(gdriveRestoreBtn, 'settingsRestoreFromBackup');
       }
     });
 
     gdriveDisconnectBtn.addEventListener('click', async () => {
-      const confirmed = await showConfirm('Disconnect Google Drive', 'This will remove Google Drive access. Your backup on Drive will not be deleted. Continue?');
+      const confirmed = await showConfirm(t('settingsDisconnectConfirmTitle'), t('settingsDisconnectConfirmBody'));
       if (!confirmed) return;
       try {
         await gdrive.signOut();
-        showToast('Disconnected from Google Drive');
+        showToast(t('settingsDisconnectSuccess'));
         await updateGdriveUI();
       } catch (err) {
-        showToast(`Failed to disconnect: ${err.message}`, 'error');
+        showToast(t('settingsDisconnectFailed', [err.message]), 'error');
       }
     });
 
@@ -574,5 +629,13 @@ async function initGdrive() {
 // Init
 // ---------------------------------------------------------------------------
 
-loadForm();
-initGdrive();
+async function init() {
+  const settings = await getSettings();
+  await initI18n(settings.locale);
+  localizePage();
+  populateLocaleOptions(settings.locale || 'auto');
+  await loadForm();
+  await initGdrive();
+}
+
+init();

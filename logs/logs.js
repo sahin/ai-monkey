@@ -4,7 +4,8 @@
  * Displays, filters, and manages execution logs.
  */
 
-import { getLogs, clearLogs } from '../lib/storage.js';
+import { getLogs, getSettings, clearLogs } from '../lib/storage.js';
+import { formatCount, initI18n, localizePage, t } from '../lib/i18n.js';
 
 // ---------------------------------------------------------------------------
 // DOM references
@@ -117,7 +118,7 @@ function renderLogs() {
   filterLogs();
 
   // Update count
-  logCountEl.textContent = `${allLogs.length} ${allLogs.length === 1 ? 'log' : 'logs'}`;
+  logCountEl.textContent = formatCount(allLogs.length, 'commonLogCountOne', 'commonLogCountOther');
 
   // Show/hide states
   if (allLogs.length === 0) {
@@ -159,10 +160,10 @@ function renderLogs() {
       const code = btn.dataset.code;
       navigator.clipboard.writeText(code).then(() => {
         btn.classList.add('copied');
-        btn.textContent = 'Copied!';
+        btn.textContent = t('logsCopied');
         setTimeout(() => {
           btn.classList.remove('copied');
-          btn.textContent = 'Copy';
+          btn.textContent = t('logsCopy');
         }, 1500);
       });
     });
@@ -171,7 +172,11 @@ function renderLogs() {
 
 function renderLogCard(log) {
   const status = getLogStatus(log);
-  const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+  const statusLabel = status === 'success'
+    ? t('logsStatusSuccess')
+    : status === 'error'
+      ? t('logsStatusError')
+      : t('logsStatusCached');
   const hasCode = log.generatedCode || log.code;
   const code = log.generatedCode || log.code || '';
   const hasError = log.error;
@@ -185,7 +190,7 @@ function renderLogCard(log) {
           <polyline points="9 18 15 12 9 6"/>
         </svg>
         <div class="log-summary">
-          <span class="log-script-name">${escapeHtml(log.scriptName || 'Unknown Script')}</span>
+          <span class="log-script-name">${escapeHtml(log.scriptName || t('logsUnknownScript'))}</span>
           <span class="log-url" title="${escapeHtml(log.url || '')}">${escapeHtml(truncateUrl(log.url))}</span>
         </div>
         <div class="log-meta">
@@ -195,24 +200,24 @@ function renderLogCard(log) {
       </div>
       <div class="log-card-body">
         <div class="log-detail-row">
-          <span class="log-detail-label">URL</span>
-          <span class="log-detail-value">${escapeHtml(log.url || 'N/A')}</span>
+          <span class="log-detail-label">${t('logsUrlLabel')}</span>
+          <span class="log-detail-value">${escapeHtml(log.url || t('logsNotAvailable'))}</span>
         </div>
         ${hasError ? `
         <div class="log-detail-row">
-          <span class="log-detail-label">Error</span>
+          <span class="log-detail-label">${t('logsErrorLabel')}</span>
           <span class="log-detail-value error-text">${escapeHtml(log.error)}</span>
         </div>` : ''}
         ${(inputTokens !== null || outputTokens !== null) ? `
         <div class="log-tokens">
-          ${inputTokens !== null ? `<span class="token-item">Input: <span>${inputTokens.toLocaleString()}</span></span>` : ''}
-          ${outputTokens !== null ? `<span class="token-item">Output: <span>${outputTokens.toLocaleString()}</span></span>` : ''}
+          ${inputTokens !== null ? `<span class="token-item">${t('logsInputTokens')} <span>${inputTokens.toLocaleString()}</span></span>` : ''}
+          ${outputTokens !== null ? `<span class="token-item">${t('logsOutputTokens')} <span>${outputTokens.toLocaleString()}</span></span>` : ''}
         </div>` : ''}
         ${hasCode ? `
         <div class="code-block-wrapper">
           <div class="code-block-header">
-            <span class="code-block-label">Generated JavaScript</span>
-            <button class="btn-copy" data-code="${escapeHtml(code)}">Copy</button>
+            <span class="code-block-label">${t('logsGeneratedJavaScript')}</span>
+            <button class="btn-copy" data-code="${escapeHtml(code)}">${t('logsCopy')}</button>
           </div>
           <div class="code-block">
             <pre>${escapeHtml(code)}</pre>
@@ -264,7 +269,7 @@ loadMoreBtn.addEventListener('click', () => {
 
 clearLogsBtn.addEventListener('click', () => {
   if (allLogs.length === 0) {
-    showToast('No logs to clear', 'error');
+    showToast(t('logsNoLogsToClear'), 'error');
     return;
   }
   confirmModal.hidden = false;
@@ -280,7 +285,7 @@ confirmOk.addEventListener('click', async () => {
   allLogs = [];
   lastLogHash = '';
   renderLogs();
-  showToast('All logs cleared');
+  showToast(t('logsCleared'));
 });
 
 confirmModal.addEventListener('click', (e) => {
@@ -307,6 +312,10 @@ autoRefreshEl.addEventListener('change', () => {
 // ---------------------------------------------------------------------------
 
 async function init() {
+  const settings = await getSettings();
+  await initI18n(settings.locale);
+  localizePage();
+
   allLogs = await getLogs();
   lastLogHash = computeHash(allLogs);
   renderLogs();
