@@ -45,6 +45,9 @@
   "popupToggleFailed": { "message": "Failed to toggle script" },
   "popupRunSuccess": { "message": "Script executed successfully" },
   "popupRunFailed": { "message": "Failed to run script" },
+  "popupScriptLanguageEnglish": { "message": "Script language: English" },
+  "popupScriptLanguageTurkish": { "message": "Script language: Turkish" },
+  "popupScriptLanguageOther": { "message": "Script language: Other" },
 
   "settingsPageTitle": { "message": "AI Monkey - Settings" },
   "settingsTitle": { "message": "Settings" },

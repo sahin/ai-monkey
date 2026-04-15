@@ -7,6 +7,8 @@
 
 import { getScripts, getSettings, saveSettings, toggleScript } from '../lib/storage.js';
 import { matchesUrl } from '../lib/matcher.js';
+import { detectLanguage } from '../lib/language.js';
+import { parseScript } from '../lib/parser.js';
 import { formatCount, initI18n, localizePage, t } from '../lib/i18n.js';
 
 // ---------------------------------------------------------------------------
@@ -71,6 +73,25 @@ function populateLocaleOptions(selectedLocale) {
   }
 }
 
+function getScriptLanguageBadge(script) {
+  const body = script.body || (script.rawText ? parseScript(script.rawText).body : '');
+  const result = detectLanguage(body);
+
+  if (result.isEnglish) {
+    return { label: 'EN', title: t('popupScriptLanguageEnglish') };
+  }
+
+  if (result.isTurkish) {
+    return { label: 'TR', title: t('popupScriptLanguageTurkish') };
+  }
+
+  if (result.language === 'other' && body.trim().length >= 10) {
+    return { label: 'INTL', title: t('popupScriptLanguageOther') };
+  }
+
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // Render a single script row
 // ---------------------------------------------------------------------------
@@ -83,16 +104,30 @@ function renderScriptRow(script, tabId) {
   const info = document.createElement('div');
   info.className = 'script-info';
 
+  const nameRow = document.createElement('div');
+  nameRow.className = 'script-name-row';
+
   const name = document.createElement('div');
   name.className = 'script-name';
   name.textContent = script.metadata?.name || script.name || t('commonUntitledScript');
+
+  const langBadge = getScriptLanguageBadge(script);
+  if (langBadge) {
+    const badge = document.createElement('span');
+    badge.className = 'script-lang-badge';
+    badge.textContent = langBadge.label;
+    badge.title = langBadge.title;
+    nameRow.appendChild(badge);
+  }
+
+  nameRow.appendChild(name);
 
   const pattern = document.createElement('div');
   pattern.className = 'script-pattern';
   const sites = script.metadata?.match || [];
   pattern.textContent = sites[0] || t('commonNoSitesSpecified');
 
-  info.appendChild(name);
+  info.appendChild(nameRow);
   info.appendChild(pattern);
 
   // Toggle

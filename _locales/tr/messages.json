@@ -45,6 +45,9 @@
   "popupToggleFailed": { "message": "Script durumu değiştirilemedi" },
   "popupRunSuccess": { "message": "Script başarıyla çalıştırıldı" },
   "popupRunFailed": { "message": "Script çalıştırılamadı" },
+  "popupScriptLanguageEnglish": { "message": "Script dili: İngilizce" },
+  "popupScriptLanguageTurkish": { "message": "Script dili: Türkçe" },
+  "popupScriptLanguageOther": { "message": "Script dili: Diğer" },
 
   "settingsPageTitle": { "message": "AI Monkey - Ayarlar" },
   "settingsTitle": { "message": "Ayarlar" },

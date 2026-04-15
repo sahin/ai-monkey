@@ -209,13 +209,37 @@ body::-webkit-scrollbar-thumb:hover {
   min-width: 0;
 }
 
+.script-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .script-name {
+  flex: 1;
+  min-width: 0;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.script-lang-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  flex-shrink: 0;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--accent-hover);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .script-pattern {
@@ -264,16 +288,16 @@ body::-webkit-scrollbar-thumb:hover {
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.toggle input:checked + .toggle-slider {
+.toggle input:checked+.toggle-slider {
   background: var(--accent);
 }
 
-.toggle input:checked + .toggle-slider::before {
+.toggle input:checked+.toggle-slider::before {
   transform: translateX(16px);
   background: #fff;
 }
 
-.toggle input:focus-visible + .toggle-slider {
+.toggle input:focus-visible+.toggle-slider {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
