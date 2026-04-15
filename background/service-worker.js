@@ -10,6 +10,10 @@ import { GoogleProvider } from '../lib/llm/google.js';
 import { GroqProvider } from '../lib/llm/groq.js';
 import { OpenRouterProvider } from '../lib/llm/openrouter.js';
 
+function i18n(key, substitutions) {
+  return chrome.i18n.getMessage(key, substitutions) || key;
+}
+
 // ---------------------------------------------------------------------------
 // Dev auto-reload: connects to dev-reload.js server and reloads on changes
 // Only active during development (fails silently in production)
@@ -68,7 +72,7 @@ async function executeScript(tabId, url, script) {
   const scriptName = script.metadata?.name || script.name;
 
   if (!settings.apiKey) {
-    throw new Error('No API key configured. Please set your API key in AI Monkey settings.');
+    throw new Error(i18n('backgroundNoApiKeyDetailed'));
   }
 
   let code, tokens;
@@ -122,7 +126,7 @@ async function extractPageContext(tabId) {
   if (results && results[0] && results[0].result) {
     return results[0].result;
   }
-  return { url: '', title: '', elements: 'Could not extract page context' };
+  return { url: '', title: '', elements: i18n('backgroundPageContextFailed') };
 }
 
 async function injectCode(tabId, code) {
@@ -168,7 +172,7 @@ async function handleMessage(message) {
     case 'RUN_SCRIPT': {
       const { tabId, scriptId } = message;
       const script = await getScript(scriptId);
-      if (!script) throw new Error('Script not found');
+      if (!script) throw new Error(i18n('backgroundScriptNotFound'));
       const tab = await chrome.tabs.get(tabId);
       await executeScript(tabId, tab.url, script);
       return { success: true };
@@ -181,7 +185,7 @@ async function handleMessage(message) {
     case 'RUN_ON_PAGE': {
       const { tabId, scriptBody } = message;
       const settings = await getSettings();
-      if (!settings.apiKey) throw new Error('No API key configured');
+      if (!settings.apiKey) throw new Error(i18n('backgroundNoApiKey'));
 
       const pageContext = await extractPageContext(tabId);
       const systemPrompt = buildSystemPrompt();

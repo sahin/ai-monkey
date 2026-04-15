@@ -2,44 +2,47 @@
  * about.js - AI Monkey features, changelog, and roadmap page
  */
 
+import { getSettings } from '../lib/storage.js';
+import { initI18n, localizePage, t } from '../lib/i18n.js';
+
 // ---------------------------------------------------------------------------
 // Features data
 // ---------------------------------------------------------------------------
 
 const features = {
   core: [
-    { name: 'English-language scripts', desc: 'Write what you want in plain English — AI generates the JavaScript', done: true },
-    { name: 'Auto-run on matching pages', desc: 'Scripts execute automatically when you visit matching sites', done: true },
-    { name: 'English site matching', desc: 'Just type "YouTube" or "Reddit" — no regex or glob patterns needed', done: true },
-    { name: '70+ known site mappings', desc: 'YouTube, GitHub, Reddit, Hacker News, Twitter/X, Amazon, and more', done: true },
-    { name: 'Category matching', desc: '"All sites", "everywhere", "any website" for global scripts', done: true },
-    { name: 'Exclude sites in English', desc: '"Don\'t run on YouTube Shorts page" — exclusions are English too', done: true },
-    { name: 'Compact DOM context extraction', desc: 'Sends page structure, headings, IDs, and ARIA labels to the LLM', done: true },
-    { name: 'LLM response caching', desc: 'Same script + same site reuses generated code to save tokens', done: true },
-    { name: 'Per-script cache control', desc: 'Set cache to "auto" or "none" for each script', done: true },
-    { name: 'Run-at timing', desc: 'Choose document-start, document-end, or document-idle', done: true },
+    { nameKey: 'aboutFeatureCore1Name', descKey: 'aboutFeatureCore1Desc', done: true },
+    { nameKey: 'aboutFeatureCore2Name', descKey: 'aboutFeatureCore2Desc', done: true },
+    { nameKey: 'aboutFeatureCore3Name', descKey: 'aboutFeatureCore3Desc', done: true },
+    { nameKey: 'aboutFeatureCore4Name', descKey: 'aboutFeatureCore4Desc', done: true },
+    { nameKey: 'aboutFeatureCore5Name', descKey: 'aboutFeatureCore5Desc', done: true },
+    { nameKey: 'aboutFeatureCore6Name', descKey: 'aboutFeatureCore6Desc', done: true },
+    { nameKey: 'aboutFeatureCore7Name', descKey: 'aboutFeatureCore7Desc', done: true },
+    { nameKey: 'aboutFeatureCore8Name', descKey: 'aboutFeatureCore8Desc', done: true },
+    { nameKey: 'aboutFeatureCore9Name', descKey: 'aboutFeatureCore9Desc', done: true },
+    { nameKey: 'aboutFeatureCore10Name', descKey: 'aboutFeatureCore10Desc', done: true }
   ],
   llm: [
-    { name: 'OpenAI support', desc: 'GPT-4o, GPT-4, or any OpenAI-compatible model', done: true },
-    { name: 'Anthropic support', desc: 'Claude Sonnet, Opus, Haiku with proper browser CORS headers', done: true },
-    { name: 'Bring your own API key', desc: 'No vendor lock-in — your key stays in local storage', done: true },
-    { name: 'Test Connection', desc: 'Verify your API key works before saving', done: true },
-    { name: 'Model selection', desc: 'Choose any model your provider supports', done: true },
+    { nameKey: 'aboutFeatureLlm1Name', descKey: 'aboutFeatureLlm1Desc', done: true },
+    { nameKey: 'aboutFeatureLlm2Name', descKey: 'aboutFeatureLlm2Desc', done: true },
+    { nameKey: 'aboutFeatureLlm3Name', descKey: 'aboutFeatureLlm3Desc', done: true },
+    { nameKey: 'aboutFeatureLlm4Name', descKey: 'aboutFeatureLlm4Desc', done: true },
+    { nameKey: 'aboutFeatureLlm5Name', descKey: 'aboutFeatureLlm5Desc', done: true }
   ],
   management: [
-    { name: 'Dashboard', desc: 'Card-based view of all scripts with search and filter', done: true },
-    { name: 'Script editor', desc: 'Form-based metadata + large English instructions textarea', done: true },
-    { name: 'Enable/disable toggle', desc: 'Per-script on/off without deleting', done: true },
-    { name: 'Import/export', desc: 'JSON format — bulk import and export all scripts', done: true },
-    { name: 'Test Run', desc: 'Run a script on the current tab directly from the editor', done: true },
+    { nameKey: 'aboutFeatureMgmt1Name', descKey: 'aboutFeatureMgmt1Desc', done: true },
+    { nameKey: 'aboutFeatureMgmt2Name', descKey: 'aboutFeatureMgmt2Desc', done: true },
+    { nameKey: 'aboutFeatureMgmt3Name', descKey: 'aboutFeatureMgmt3Desc', done: true },
+    { nameKey: 'aboutFeatureMgmt4Name', descKey: 'aboutFeatureMgmt4Desc', done: true },
+    { nameKey: 'aboutFeatureMgmt5Name', descKey: 'aboutFeatureMgmt5Desc', done: true }
   ],
   ui: [
-    { name: 'Popup', desc: 'Quick view of scripts matching the current tab with run buttons', done: true },
-    { name: 'Badge count', desc: 'Extension icon shows number of matching scripts per tab', done: true },
-    { name: 'Execution logs', desc: 'Full history with timestamps, status, tokens used, and generated code', done: true },
-    { name: 'Log filtering', desc: 'Search by script name or URL, filter by status', done: true },
-    { name: 'Dark theme', desc: 'Consistent indigo-accented dark UI across all pages', done: true },
-  ],
+    { nameKey: 'aboutFeatureUi1Name', descKey: 'aboutFeatureUi1Desc', done: true },
+    { nameKey: 'aboutFeatureUi2Name', descKey: 'aboutFeatureUi2Desc', done: true },
+    { nameKey: 'aboutFeatureUi3Name', descKey: 'aboutFeatureUi3Desc', done: true },
+    { nameKey: 'aboutFeatureUi4Name', descKey: 'aboutFeatureUi4Desc', done: true },
+    { nameKey: 'aboutFeatureUi5Name', descKey: 'aboutFeatureUi5Desc', done: true }
+  ]
 };
 
 // ---------------------------------------------------------------------------
@@ -49,25 +52,25 @@ const features = {
 const changelog = [
   {
     version: 'v0.1.0',
-    date: 'April 11, 2026',
+    date: '2026-04-11',
     tag: 'initial',
-    tagLabel: 'Initial Release',
+    tagLabelKey: 'aboutChangelogTagInitial',
     changes: [
-      { type: 'added', text: 'English-language scripts — describe automations in plain English' },
-      { type: 'added', text: 'English site matching — type "YouTube" instead of *://youtube.com/*' },
-      { type: 'added', text: '70+ built-in site name-to-domain mappings' },
-      { type: 'added', text: 'OpenAI and Anthropic LLM provider support' },
-      { type: 'added', text: 'Auto-run scripts on matching pages via service worker' },
-      { type: 'added', text: 'Compact DOM context extraction for accurate code generation' },
-      { type: 'added', text: 'LLM response caching to save API tokens' },
-      { type: 'added', text: 'Script dashboard with search, import, and export' },
-      { type: 'added', text: 'Form-based script editor with Test Run' },
-      { type: 'added', text: 'Popup with per-tab script matching and quick controls' },
-      { type: 'added', text: 'Execution log viewer with filtering and code preview' },
-      { type: 'added', text: 'Settings page with API key management and Test Connection' },
-      { type: 'added', text: 'Dark theme across all extension pages' },
-    ],
-  },
+      { type: 'added', textKey: 'aboutChangelog1' },
+      { type: 'added', textKey: 'aboutChangelog2' },
+      { type: 'added', textKey: 'aboutChangelog3' },
+      { type: 'added', textKey: 'aboutChangelog4' },
+      { type: 'added', textKey: 'aboutChangelog5' },
+      { type: 'added', textKey: 'aboutChangelog6' },
+      { type: 'added', textKey: 'aboutChangelog7' },
+      { type: 'added', textKey: 'aboutChangelog8' },
+      { type: 'added', textKey: 'aboutChangelog9' },
+      { type: 'added', textKey: 'aboutChangelog10' },
+      { type: 'added', textKey: 'aboutChangelog11' },
+      { type: 'added', textKey: 'aboutChangelog12' },
+      { type: 'added', textKey: 'aboutChangelog13' }
+    ]
+  }
 ];
 
 // ---------------------------------------------------------------------------
@@ -76,46 +79,46 @@ const changelog = [
 
 const roadmap = [
   {
-    phase: 'Up Next',
+    phaseKey: 'aboutRoadmapNext',
     icon: 'next',
     emoji: '🎯',
-    subtitle: 'v0.2.0 — Planned',
+    subtitleKey: 'aboutRoadmapNextSubtitle',
     items: [
-      { icon: '🌐', text: 'Firefox support', desc: 'Port to Firefox with WebExtension APIs' },
-      { icon: '🤖', text: 'Google Gemini provider', desc: 'Add Gemini as a third LLM option' },
-      { icon: '🔄', text: 'MutationObserver auto-mode', desc: 'Automatically re-run scripts when SPAs update content' },
-      { icon: '📦', text: 'Script sharing', desc: 'Share scripts via URL or import from a public library' },
-      { icon: '🧩', text: 'Script variables', desc: 'User-defined variables like {{username}} that prompt on first run' },
-      { icon: '⏱️', text: 'Token usage dashboard', desc: 'Track API costs per script with charts and totals' },
-    ],
+      { icon: '🌐', textKey: 'aboutRoadmapNext1Text', descKey: 'aboutRoadmapNext1Desc' },
+      { icon: '🤖', textKey: 'aboutRoadmapNext2Text', descKey: 'aboutRoadmapNext2Desc' },
+      { icon: '🔄', textKey: 'aboutRoadmapNext3Text', descKey: 'aboutRoadmapNext3Desc' },
+      { icon: '📦', textKey: 'aboutRoadmapNext4Text', descKey: 'aboutRoadmapNext4Desc' },
+      { icon: '🧩', textKey: 'aboutRoadmapNext5Text', descKey: 'aboutRoadmapNext5Desc' },
+      { icon: '⏱️', textKey: 'aboutRoadmapNext6Text', descKey: 'aboutRoadmapNext6Desc' }
+    ]
   },
   {
-    phase: 'Later',
+    phaseKey: 'aboutRoadmapLater',
     icon: 'later',
     emoji: '🔮',
-    subtitle: 'v0.3.0 — Exploring',
+    subtitleKey: 'aboutRoadmapLaterSubtitle',
     items: [
-      { icon: '💬', text: 'Conversational debugging', desc: 'Chat with AI about why a script isn\'t working' },
-      { icon: '📸', text: 'Visual page context', desc: 'Send a screenshot to the LLM for better element targeting' },
-      { icon: '🔗', text: 'Script chaining', desc: 'Run scripts in sequence — output of one feeds the next' },
-      { icon: '📋', text: 'Script templates', desc: 'Pre-built templates for common tasks (ad blocking, dark mode, etc.)' },
-      { icon: '🔒', text: 'Code review mode', desc: 'Review generated JS before it runs on sensitive sites' },
-      { icon: '🌍', text: 'Multi-language instructions', desc: 'Write scripts in any language, not just English' },
-    ],
+      { icon: '💬', textKey: 'aboutRoadmapLater1Text', descKey: 'aboutRoadmapLater1Desc' },
+      { icon: '📸', textKey: 'aboutRoadmapLater2Text', descKey: 'aboutRoadmapLater2Desc' },
+      { icon: '🔗', textKey: 'aboutRoadmapLater3Text', descKey: 'aboutRoadmapLater3Desc' },
+      { icon: '📋', textKey: 'aboutRoadmapLater4Text', descKey: 'aboutRoadmapLater4Desc' },
+      { icon: '🔒', textKey: 'aboutRoadmapLater5Text', descKey: 'aboutRoadmapLater5Desc' },
+      { icon: '🌍', textKey: 'aboutRoadmapLater6Text', descKey: 'aboutRoadmapLater6Desc' }
+    ]
   },
   {
-    phase: 'Future',
+    phaseKey: 'aboutRoadmapFuture',
     icon: 'future',
     emoji: '🚀',
-    subtitle: 'Long-term vision',
+    subtitleKey: 'aboutRoadmapFutureSubtitle',
     items: [
-      { icon: '🏪', text: 'Script marketplace', desc: 'Community-driven script library with ratings and reviews' },
-      { icon: '🤝', text: 'Team sharing', desc: 'Share script collections within organizations' },
-      { icon: '📱', text: 'Mobile support', desc: 'Run scripts on mobile browsers via companion app' },
-      { icon: '🧠', text: 'Local LLM support', desc: 'Run with Ollama or llama.cpp — no API key needed' },
-      { icon: '⚡', text: 'Hybrid execution', desc: 'Cache common patterns as static JS, only call LLM for new pages' },
-    ],
-  },
+      { icon: '🏪', textKey: 'aboutRoadmapFuture1Text', descKey: 'aboutRoadmapFuture1Desc' },
+      { icon: '🤝', textKey: 'aboutRoadmapFuture2Text', descKey: 'aboutRoadmapFuture2Desc' },
+      { icon: '📱', textKey: 'aboutRoadmapFuture3Text', descKey: 'aboutRoadmapFuture3Desc' },
+      { icon: '🧠', textKey: 'aboutRoadmapFuture4Text', descKey: 'aboutRoadmapFuture4Desc' },
+      { icon: '⚡', textKey: 'aboutRoadmapFuture5Text', descKey: 'aboutRoadmapFuture5Desc' }
+    ]
+  }
 ];
 
 // ---------------------------------------------------------------------------
@@ -137,11 +140,11 @@ function renderFeature(feature) {
 
   const name = document.createElement('div');
   name.className = 'feature-name';
-  name.textContent = feature.name;
+  name.textContent = t(feature.nameKey);
 
   const desc = document.createElement('div');
   desc.className = 'feature-desc';
-  desc.textContent = feature.desc;
+  desc.textContent = t(feature.descKey);
 
   body.appendChild(name);
   body.appendChild(desc);
@@ -172,16 +175,16 @@ function renderFeatures() {
   const pct = Math.round((done / total) * 100);
   const summary = document.getElementById('progress-summary');
   summary.innerHTML = `
-    <div class="progress-stat">
-      <div class="number">${done}/${total}</div>
-      <div class="label">features shipped</div>
-    </div>
-    <div class="progress-bar-container">
-      <div class="progress-label">
-        <span>Progress</span>
-        <span>${pct}%</span>
+      <div class="progress-stat">
+        <div class="number">${done}/${total}</div>
+        <div class="label">${t('aboutFeaturesShipped')}</div>
       </div>
-      <div class="progress-bar">
+      <div class="progress-bar-container">
+        <div class="progress-label">
+          <span>${t('aboutProgress')}</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="progress-bar">
         <div class="progress-fill" style="width: ${pct}%"></div>
       </div>
     </div>
@@ -192,6 +195,11 @@ function renderChangelog() {
   const container = document.getElementById('changelog');
 
   for (const entry of changelog) {
+    const formattedDate = new Date(`${entry.date}T00:00:00`).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
     const el = document.createElement('div');
     el.className = 'changelog-entry';
 
@@ -199,14 +207,14 @@ function renderChangelog() {
       <div class="changelog-dot"></div>
       <div class="changelog-header">
         <span class="changelog-version">${entry.version}</span>
-        <span class="changelog-date">${entry.date}</span>
-        <span class="changelog-tag ${entry.tag}">${entry.tagLabel}</span>
+        <span class="changelog-date">${formattedDate}</span>
+        <span class="changelog-tag ${entry.tag}">${t(entry.tagLabelKey)}</span>
       </div>
       <ul class="changelog-changes">
         ${entry.changes.map((c) => `
           <li>
-            <span class="change-type ${c.type}">${c.type}</span>
-            <span>${c.text}</span>
+            <span class="change-type ${c.type}">${t('aboutChangeAdded')}</span>
+            <span>${t(c.textKey)}</span>
           </li>
         `).join('')}
       </ul>
@@ -227,8 +235,8 @@ function renderRoadmap() {
       <div class="phase-header">
         <div class="phase-icon ${phase.icon}">${phase.emoji}</div>
         <div>
-          <div class="phase-title">${phase.phase}</div>
-          <div class="phase-subtitle">${phase.subtitle}</div>
+          <div class="phase-title">${t(phase.phaseKey)}</div>
+          <div class="phase-subtitle">${t(phase.subtitleKey)}</div>
         </div>
       </div>
       <div class="roadmap-items">
@@ -236,8 +244,8 @@ function renderRoadmap() {
           <div class="roadmap-item">
             <span class="roadmap-item-icon">${item.icon}</span>
             <div>
-              <div class="roadmap-item-text">${item.text}</div>
-              <div class="roadmap-item-desc">${item.desc}</div>
+              <div class="roadmap-item-text">${t(item.textKey)}</div>
+              <div class="roadmap-item-desc">${t(item.descKey)}</div>
             </div>
           </div>
         `).join('')}
@@ -281,6 +289,13 @@ document.getElementById('back-link').addEventListener('click', (e) => {
 // Init
 // ---------------------------------------------------------------------------
 
-renderFeatures();
-renderChangelog();
-renderRoadmap();
+async function init() {
+  const settings = await getSettings();
+  await initI18n(settings.locale);
+  localizePage();
+  renderFeatures();
+  renderChangelog();
+  renderRoadmap();
+}
+
+init();

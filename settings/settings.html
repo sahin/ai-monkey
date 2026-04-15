@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-document-title="settingsPageTitle">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,13 +11,13 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <a href="../dashboard/dashboard.html" class="back-link" title="Back to Dashboard">
+        <a href="../dashboard/dashboard.html" class="back-link" data-i18n-title="commonBackToDashboard" title="Back to Dashboard">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
         </a>
         <span class="monkey-emoji">&#x1F435;</span>
-        <h1>Settings</h1>
+        <h1 data-i18n="settingsTitle">Settings</h1>
       </div>
       <div class="header-right">
         <button id="save-btn" class="btn btn-primary">
@@ -26,7 +26,7 @@
             <polyline points="17 21 17 13 7 13 7 21"/>
             <polyline points="7 3 7 8 15 8"/>
           </svg>
-          Save Settings
+          <span data-i18n="settingsSaveButton">Save Settings</span>
         </button>
       </div>
     </header>
@@ -34,36 +34,49 @@
     <!-- Main content -->
     <main class="settings-main">
 
+      <!-- Language -->
+      <section class="section-card">
+        <h2 class="section-title" data-i18n="settingsLanguageSection">Language</h2>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="locale" class="form-label" data-i18n="commonLanguageLabel">Language</label>
+            <select id="locale" class="form-select"></select>
+            <span class="form-hint" data-i18n="commonLanguageHint">Choose how AI Monkey should display interface text.</span>
+          </div>
+        </div>
+      </section>
+
       <!-- API Configuration -->
       <section class="section-card">
-        <h2 class="section-title">API Configuration</h2>
+        <h2 class="section-title" data-i18n="settingsApiConfiguration">API Configuration</h2>
 
         <div class="form-grid">
           <div class="form-group">
-            <label for="provider" class="form-label">Provider</label>
+            <label for="provider" class="form-label" data-i18n="settingsProviderLabel">Provider</label>
             <select id="provider" class="form-select">
               <!-- Populated by JS from PROVIDERS config -->
             </select>
           </div>
 
           <div class="form-group">
-            <label for="model" class="form-label">Model</label>
+            <label for="model" class="form-label" data-i18n="settingsModelLabel">Model</label>
             <select id="model" class="form-select">
               <!-- Populated dynamically based on selected provider -->
             </select>
           </div>
 
           <div class="form-group full-width" id="custom-model-group" hidden>
-            <label for="custom-model" class="form-label">Custom Model ID</label>
-            <input type="text" id="custom-model" class="form-input" placeholder="Enter model identifier...">
-            <span class="form-hint">Enter the exact model ID from your provider's documentation.</span>
+            <label for="custom-model" class="form-label" data-i18n="settingsCustomModelLabel">Custom Model ID</label>
+            <input type="text" id="custom-model" class="form-input" data-i18n-placeholder="settingsCustomModelPlaceholder" placeholder="Enter model identifier...">
+            <span class="form-hint" data-i18n="settingsCustomModelHint">Enter the exact model ID from your provider's documentation.</span>
           </div>
 
           <div class="form-group full-width">
-            <label for="api-key" class="form-label">API Key</label>
+            <label for="api-key" class="form-label" data-i18n="settingsApiKeyLabel">API Key</label>
             <div class="password-wrapper">
-              <input type="password" id="api-key" class="form-input" placeholder="sk-...">
-              <button type="button" id="toggle-key" class="btn-eye" title="Toggle visibility">
+              <input type="password" id="api-key" class="form-input" data-i18n-placeholder="settingsApiKeyPlaceholder" placeholder="sk-...">
+              <button type="button" id="toggle-key" class="btn-eye" data-i18n-title="settingsToggleVisibilityTitle" title="Toggle visibility">
                 <svg id="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                   <circle cx="12" cy="12" r="3"/>
@@ -83,7 +96,7 @@
                   <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
                   <polyline points="22 4 12 14.01 9 11.01"/>
                 </svg>
-                Test Connection
+                <span data-i18n="settingsTestConnection">Test Connection</span>
               </button>
               <span id="test-result" class="test-result"></span>
             </div>
@@ -93,11 +106,11 @@
 
       <!-- Defaults -->
       <section class="section-card">
-        <h2 class="section-title">Defaults</h2>
+        <h2 class="section-title" data-i18n="settingsDefaults">Defaults</h2>
 
         <div class="form-grid">
           <div class="form-group">
-            <label for="default-runat" class="form-label">Default Run At</label>
+            <label for="default-runat" class="form-label" data-i18n="settingsDefaultRunAtLabel">Default Run At</label>
             <select id="default-runat" class="form-select">
               <option value="document-start">document-start</option>
               <option value="document-end">document-end</option>
@@ -106,13 +119,13 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Cache Enabled</label>
+            <label class="form-label" data-i18n="settingsCacheEnabledLabel">Cache Enabled</label>
             <div class="toggle-row">
               <label class="toggle">
                 <input type="checkbox" id="cache-enabled">
                 <span class="toggle-slider"></span>
               </label>
-              <span id="cache-label" class="toggle-label">Enabled</span>
+              <span id="cache-label" class="toggle-label" data-i18n="settingsCacheEnabledOn">Enabled</span>
             </div>
           </div>
         </div>
@@ -120,27 +133,27 @@
 
       <!-- Google Drive Sync -->
       <section class="section-card">
-        <h2 class="section-title">Google Drive Backup</h2>
+        <h2 class="section-title" data-i18n="settingsGoogleDriveBackup">Google Drive Backup</h2>
 
         <div class="data-actions">
           <div class="data-action">
             <div class="data-info">
-              <span class="data-label">Status</span>
-              <span id="gdrive-status" class="data-count">Not connected</span>
+              <span class="data-label" data-i18n="settingsStatusLabel">Status</span>
+              <span id="gdrive-status" class="data-count" data-i18n="settingsNotConnected">Not connected</span>
             </div>
             <button id="gdrive-connect-btn" class="btn btn-success">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
                 <polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
-              Connect Google Drive
+              <span data-i18n="settingsConnectGoogleDrive">Connect Google Drive</span>
             </button>
           </div>
 
           <div class="data-action">
             <div class="data-info">
-              <span class="data-label">Last Backup</span>
-              <span id="gdrive-last-backup" class="data-count">Never</span>
+              <span class="data-label" data-i18n="settingsLastBackup">Last Backup</span>
+              <span id="gdrive-last-backup" class="data-count" data-i18n="settingsNever">Never</span>
             </div>
             <button id="gdrive-backup-btn" class="btn btn-subtle" disabled>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -148,14 +161,14 @@
                 <polyline points="17 8 12 3 7 8"/>
                 <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
-              Backup Now
+              <span data-i18n="settingsBackupNow">Backup Now</span>
             </button>
           </div>
 
           <div class="data-action">
             <div class="data-info">
-              <span class="data-label">Restore</span>
-              <span class="data-count">Download scripts from Google Drive</span>
+              <span class="data-label" data-i18n="settingsRestoreLabel">Restore</span>
+              <span class="data-count" data-i18n="settingsRestoreDescription">Download scripts from Google Drive</span>
             </div>
             <button id="gdrive-restore-btn" class="btn btn-subtle" disabled>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -163,45 +176,45 @@
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Restore from Backup
+              <span data-i18n="settingsRestoreFromBackup">Restore from Backup</span>
             </button>
           </div>
 
           <div class="data-action">
             <div class="data-info">
-              <span class="data-label">Disconnect</span>
-              <span class="data-count">Remove Google Drive access</span>
+              <span class="data-label" data-i18n="settingsDisconnectLabel">Disconnect</span>
+              <span class="data-count" data-i18n="settingsDisconnectDescription">Remove Google Drive access</span>
             </div>
-            <button id="gdrive-disconnect-btn" class="btn btn-danger" disabled>Disconnect</button>
+            <button id="gdrive-disconnect-btn" class="btn btn-danger" disabled data-i18n="settingsDisconnectButton">Disconnect</button>
           </div>
         </div>
       </section>
 
       <!-- Data -->
       <section class="section-card">
-        <h2 class="section-title">Data</h2>
+        <h2 class="section-title" data-i18n="settingsData">Data</h2>
 
         <div class="data-actions">
           <div class="data-action">
             <div class="data-info">
-              <span class="data-label">Cache</span>
+              <span class="data-label" data-i18n="settingsCache">Cache</span>
               <span id="cache-count" class="data-count">0 entries</span>
             </div>
-            <button id="clear-cache-btn" class="btn btn-subtle">Clear Cache</button>
+            <button id="clear-cache-btn" class="btn btn-subtle" data-i18n="settingsClearCacheButton">Clear Cache</button>
           </div>
 
           <div class="data-action">
             <div class="data-info">
-              <span class="data-label">Logs</span>
+              <span class="data-label" data-i18n="settingsLogs">Logs</span>
               <span id="log-count" class="data-count">0 entries</span>
             </div>
-            <button id="clear-logs-btn" class="btn btn-subtle">Clear Logs</button>
+            <button id="clear-logs-btn" class="btn btn-subtle" data-i18n="logsClearButton">Clear Logs</button>
           </div>
 
           <div class="data-action">
             <div class="data-info">
-              <span class="data-label">Scripts</span>
-              <span class="data-count">Export all scripts as JSON</span>
+              <span class="data-label" data-i18n="settingsScripts">Scripts</span>
+              <span class="data-count" data-i18n="settingsExportDescription">Export all scripts as JSON</span>
             </div>
             <button id="export-btn" class="btn btn-subtle">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -209,16 +222,16 @@
                 <polyline points="17 8 12 3 7 8"/>
                 <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
-              Export All Scripts
+              <span data-i18n="settingsExportAllScripts">Export All Scripts</span>
             </button>
           </div>
 
           <div class="data-action danger-zone">
             <div class="data-info">
-              <span class="data-label">Reset</span>
-              <span class="data-count">Restore all settings to defaults</span>
+              <span class="data-label" data-i18n="settingsResetLabel">Reset</span>
+              <span class="data-count" data-i18n="settingsResetDescription">Restore all settings to defaults</span>
             </div>
-            <button id="reset-btn" class="btn btn-danger">Reset Settings</button>
+            <button id="reset-btn" class="btn btn-danger" data-i18n="settingsResetButton">Reset Settings</button>
           </div>
         </div>
       </section>
@@ -227,11 +240,11 @@
     <!-- Confirm modal -->
     <div id="confirm-modal" class="modal-overlay" hidden>
       <div class="modal">
-        <h3 class="modal-title" id="confirm-title">Confirm</h3>
-        <p class="modal-body" id="confirm-body">Are you sure?</p>
+        <h3 class="modal-title" id="confirm-title" data-i18n="settingsConfirmTitle">Confirm</h3>
+        <p class="modal-body" id="confirm-body" data-i18n="settingsConfirmBody">Are you sure?</p>
         <div class="modal-actions">
-          <button id="confirm-cancel" class="btn btn-subtle">Cancel</button>
-          <button id="confirm-ok" class="btn btn-danger">Confirm</button>
+          <button id="confirm-cancel" class="btn btn-subtle" data-i18n="commonCancel">Cancel</button>
+          <button id="confirm-ok" class="btn btn-danger" data-i18n="commonConfirm">Confirm</button>
         </div>
       </div>
     </div>

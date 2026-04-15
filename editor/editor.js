@@ -5,10 +5,11 @@
  * and a large textarea for English-language instructions.
  */
 
-import { getScript, saveScript } from '../lib/storage.js';
+import { getScript, getSettings, saveScript } from '../lib/storage.js';
 import { createTemplate, parseScript, serializeScript } from '../lib/parser.js';
 import { decodeSharePayload } from '../lib/share.js';
 import { detectLanguage } from '../lib/language.js';
+import { formatCount, initI18n, localizePage, t } from '../lib/i18n.js';
 
 // ---------------------------------------------------------------------------
 // DOM references
@@ -38,6 +39,25 @@ const toastEl = document.getElementById('toast');
 
 let scriptId = null; // null = new script
 let existingScript = null; // loaded script object for updates
+
+function getScriptBody(script) {
+  if (script?.rawText) {
+    return parseScript(script.rawText).body;
+  }
+  return script?.body || '';
+}
+
+function getScriptLocale(script) {
+  const result = detectLanguage(getScriptBody(script));
+  if (result.isEnglish) return 'en';
+  if (result.isTurkish) return 'tr';
+  return null;
+}
+
+async function applyPageLocale(localePreference) {
+  await initI18n(localePreference);
+  localizePage();
+}
 
 // ---------------------------------------------------------------------------
 // Toast
@@ -76,7 +96,7 @@ const langIndicator = document.getElementById('lang-indicator');
 
 function updateCharCount() {
   const len = bodyTextarea.value.length;
-  const text = `${len} character${len !== 1 ? 's' : ''}`;
+  const text = formatCount(len, 'editorCharacterCountOne', 'editorCharacterCountOther');
   charCount.textContent = text;
   statusChars.textContent = text;
 }
@@ -87,10 +107,18 @@ function updateLanguageIndicator() {
     langIndicator.hidden = true;
     return;
   }
+
   const result = detectLanguage(text);
-  if (!result.isEnglish) {
+
+  // English and Turkish are first-class instruction languages now.
+  if (result.isEnglish || result.isTurkish) {
+    langIndicator.hidden = true;
+    return;
+  }
+
+  if (result.language === 'other') {
     langIndicator.hidden = false;
-    langIndicator.textContent = '🌐 Non-English detected — will auto-translate';
+    langIndicator.textContent = t('editorNonEnglishDetected');
   } else {
     langIndicator.hidden = true;
   }
@@ -144,6 +172,7 @@ function populateForm(script) {
   }
 
   updateCharCount();
+  updateLanguageIndicator();
 }
 
 // ---------------------------------------------------------------------------
@@ -211,7 +240,7 @@ function validate() {
   const name = nameInput.value.trim();
   if (!name) {
     nameInput.focus();
-    showToast('Script name is required', 'error');
+    showToast(t('editorNameRequired'), 'error');
     return false;
   }
 
@@ -222,7 +251,7 @@ function validate() {
 
   if (matchPatterns.length === 0) {
     matchTextarea.focus();
-    showToast('Please describe which sites this script should run on', 'error');
+    showToast(t('editorSitesRequired'), 'error');
     return false;
   }
 
@@ -237,17 +266,17 @@ saveBtn.addEventListener('click', async () => {
   if (!validate()) return;
 
   saveBtn.disabled = true;
-  statusText.textContent = 'Saving...';
+  statusText.textContent = t('editorSaving');
 
   try {
     const script = buildScriptFromForm();
     await saveScript(script);
-    showToast('Script saved');
+    showToast(t('editorSaved'));
     // Short delay so user sees the toast before redirect
     setTimeout(goToDashboard, 600);
   } catch (err) {
-    showToast(`Failed to save: ${err.message}`, 'error');
-    statusText.textContent = 'Save failed';
+    showToast(t('editorSaveFailed', [err.message]), 'error');
+    statusText.textContent = t('editorSaveFailedStatus');
     saveBtn.disabled = false;
   }
 });
@@ -264,13 +293,13 @@ cancelBtn.addEventListener('click', goToDashboard);
 
 testBtn.addEventListener('click', async () => {
   testBtn.disabled = true;
-  statusText.textContent = 'Running test...';
+  statusText.textContent = t('editorRunningTest');
 
   try {
     // Get the current active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) {
-      showToast('No active tab found', 'error');
+      showToast(t('editorNoActiveTab'), 'error');
       return;
     }
 
@@ -281,15 +310,15 @@ testBtn.addEventListener('click', async () => {
     });
 
     if (response?.error) {
-      showToast(`Test failed: ${response.error}`, 'error');
-      statusText.textContent = 'Test failed';
+      showToast(t('editorTestFailed', [response.error]), 'error');
+      statusText.textContent = t('editorTestFailedStatus');
     } else {
-      showToast('Test run completed');
-      statusText.textContent = 'Test run OK';
+      showToast(t('editorTestCompleted'));
+      statusText.textContent = t('editorTestOkStatus');
     }
   } catch (err) {
-    showToast(`Test failed: ${err.message}`, 'error');
-    statusText.textContent = 'Test failed';
+    showToast(t('editorTestFailed', [err.message]), 'error');
+    statusText.textContent = t('editorTestFailedStatus');
   } finally {
     testBtn.disabled = false;
   }
@@ -300,6 +329,10 @@ testBtn.addEventListener('click', async () => {
 // ---------------------------------------------------------------------------
 
 async function init() {
+  const settings = await getSettings();
+  await initI18n(settings.locale);
+  localizePage();
+
   // Check URL params for script id
   const params = new URLSearchParams(window.location.search);
   scriptId = params.get('id');
@@ -309,48 +342,56 @@ async function init() {
   if (installData) {
     try {
       const shared = decodeSharePayload(installData);
-      pageTitle.textContent = 'Install Shared Script';
-      document.title = 'AI Monkey - Install Script';
+      const scriptLocale = getScriptLocale(shared);
+      if (scriptLocale) {
+        await applyPageLocale(scriptLocale);
+      }
+      pageTitle.textContent = t('editorInstallScriptTitle');
+      document.title = t('editorPageTitleInstall');
       populateForm({ metadata: shared.metadata, body: shared.body });
-      showToast('Script loaded from share link — review and save to install');
-      statusText.textContent = 'Review & Save';
+      showToast(t('editorShareLoaded'));
+      statusText.textContent = t('editorReviewAndSave');
       updateCharCount();
       return;
     } catch (err) {
-      showToast('Invalid share link', 'error');
+      showToast(t('editorInvalidShareLink'), 'error');
     }
   }
 
   if (scriptId) {
-    pageTitle.textContent = 'Edit Script';
-    document.title = 'AI Monkey - Edit Script';
-    statusText.textContent = 'Loading...';
+    statusText.textContent = t('commonLoading');
 
     try {
       existingScript = await getScript(scriptId);
       if (existingScript) {
+        const scriptLocale = getScriptLocale(existingScript);
+        if (scriptLocale) {
+          await applyPageLocale(scriptLocale);
+        }
+        pageTitle.textContent = t('editorEditScriptTitle');
+        document.title = t('editorPageTitleEdit');
         populateForm(existingScript);
-        statusText.textContent = 'Ready';
+        statusText.textContent = t('editorStatusReady');
       } else {
-        showToast('Script not found', 'error');
-        statusText.textContent = 'Script not found';
+        showToast(t('editorScriptNotFound'), 'error');
+        statusText.textContent = t('editorScriptNotFound');
         scriptId = null;
       }
     } catch (err) {
-      showToast('Failed to load script', 'error');
-      statusText.textContent = 'Load failed';
+      showToast(t('editorFailedToLoadScript'), 'error');
+      statusText.textContent = t('commonLoadFailed');
       scriptId = null;
     }
   } else {
     // New script: use default template values
-    pageTitle.textContent = 'New Script';
+    pageTitle.textContent = t('editorNewScriptTitle');
     const template = createTemplate('', '');
     const parsed = parseScript(template);
     matchTextarea.value = parsed.metadata.match.join('\n');
     runAtSelect.value = parsed.metadata.runAt;
     cacheSelect.value = parsed.metadata.cache;
     versionInput.value = parsed.metadata.version;
-    statusText.textContent = 'Ready';
+    statusText.textContent = t('editorStatusReady');
 
     // Pre-fill "Run on" with the source URL if passed via query param
     const sourceUrl = params.get('url');

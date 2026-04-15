@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-document-title="editorPageTitle">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,23 +12,23 @@
     <header class="header">
       <div class="header-left">
         <span class="monkey-emoji">&#x1F435;</span>
-        <h1 id="page-title">New Script</h1>
+        <h1 id="page-title" data-i18n="editorNewScriptTitle">New Script</h1>
       </div>
       <div class="header-right">
-        <button id="test-btn" class="btn btn-test" title="Test run on current tab">
+        <button id="test-btn" class="btn btn-test" data-i18n-title="editorTestRunTitle" title="Test run on current tab">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="5 3 19 12 5 21 5 3"/>
           </svg>
-          Test Run
+          <span data-i18n="editorTestRunButton">Test Run</span>
         </button>
-        <button id="cancel-btn" class="btn btn-subtle">Cancel</button>
+        <button id="cancel-btn" class="btn btn-subtle" data-i18n="commonCancel">Cancel</button>
         <button id="save-btn" class="btn btn-primary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
             <polyline points="17 21 17 13 7 13 7 21"/>
             <polyline points="7 3 7 8 15 8"/>
           </svg>
-          Save
+          <span data-i18n="commonSave">Save</span>
         </button>
       </div>
     </header>
@@ -37,44 +37,44 @@
     <main class="editor-main">
       <!-- Metadata section -->
       <section class="metadata-section">
-        <h2 class="section-title">Script Metadata</h2>
+        <h2 class="section-title" data-i18n="editorMetadataTitle">Script Metadata</h2>
 
         <div class="form-grid">
           <div class="form-group">
-            <label for="script-name" class="form-label">Name <span class="required">*</span></label>
-            <input type="text" id="script-name" class="form-input" placeholder="My Awesome Script">
+            <label for="script-name" class="form-label"><span data-i18n="editorNameLabel">Name</span> <span class="required">*</span></label>
+            <input type="text" id="script-name" class="form-input" data-i18n-placeholder="editorNamePlaceholder" placeholder="My Awesome Script">
           </div>
 
           <div class="form-group">
-            <label for="script-version" class="form-label">Version</label>
+            <label for="script-version" class="form-label" data-i18n="editorVersionLabel">Version</label>
             <input type="text" id="script-version" class="form-input" placeholder="1.0" value="1.0">
           </div>
 
           <div class="form-group full-width">
-            <label for="script-description" class="form-label">Description</label>
-            <input type="text" id="script-description" class="form-input" placeholder="A brief description of what this script does">
+            <label for="script-description" class="form-label" data-i18n="editorDescriptionLabel">Description</label>
+            <input type="text" id="script-description" class="form-input" data-i18n-placeholder="editorDescriptionPlaceholder" placeholder="A brief description of what this script does">
           </div>
 
           <div class="form-group">
-            <label for="script-match" class="form-label">Run on <span class="required">*</span></label>
-            <textarea id="script-match" class="form-textarea" rows="3" placeholder="Describe which sites in plain English, e.g.&#10;YouTube&#10;Reddit and Hacker News&#10;All Google sites"></textarea>
-            <span class="form-hint">Describe which websites this script should run on. One per line.</span>
+            <label for="script-match" class="form-label"><span data-i18n="editorRunOnLabel">Run on</span> <span class="required">*</span></label>
+            <textarea id="script-match" class="form-textarea" rows="3" data-i18n-placeholder="editorRunOnPlaceholder" placeholder="Describe which sites in plain English, e.g.&#10;YouTube&#10;Reddit and Hacker News&#10;All Google sites"></textarea>
+            <span class="form-hint" data-i18n="editorRunOnHint">Describe which websites this script should run on. One per line.</span>
           </div>
 
           <div class="form-group">
-            <label for="script-exclude" class="form-label">Don't run on</label>
-            <textarea id="script-exclude" class="form-textarea" rows="3" placeholder="Sites to skip (optional), e.g.&#10;YouTube Shorts page"></textarea>
-            <span class="form-hint">Describe which websites to exclude. One per line.</span>
+            <label for="script-exclude" class="form-label" data-i18n="editorDontRunOnLabel">Don't run on</label>
+            <textarea id="script-exclude" class="form-textarea" rows="3" data-i18n-placeholder="editorDontRunOnPlaceholder" placeholder="Sites to skip (optional), e.g.&#10;YouTube Shorts page"></textarea>
+            <span class="form-hint" data-i18n="editorDontRunOnHint">Describe which websites to exclude. One per line.</span>
           </div>
 
           <div class="form-group full-width">
-            <label for="script-condition" class="form-label">Only run if</label>
-            <textarea id="script-condition" class="form-textarea" rows="2" placeholder="Conditions that must be true (optional), e.g.&#10;A cookie consent banner is visible&#10;The page has a sidebar"></textarea>
-            <span class="form-hint">Describe elements that must exist on the page. One per line. Script is skipped if conditions aren't met.</span>
+            <label for="script-condition" class="form-label" data-i18n="editorOnlyRunIfLabel">Only run if</label>
+            <textarea id="script-condition" class="form-textarea" rows="2" data-i18n-placeholder="editorOnlyRunIfPlaceholder" placeholder="Conditions that must be true (optional), e.g.&#10;A cookie consent banner is visible&#10;The page has a sidebar"></textarea>
+            <span class="form-hint" data-i18n="editorOnlyRunIfHint">Describe elements that must exist on the page. One per line. Script is skipped if conditions aren't met.</span>
           </div>
 
           <div class="form-group">
-            <label for="script-runat" class="form-label">Run At</label>
+            <label for="script-runat" class="form-label" data-i18n="editorRunAtLabel">Run At</label>
             <select id="script-runat" class="form-select">
               <option value="document-idle">document-idle</option>
               <option value="document-end">document-end</option>
@@ -83,7 +83,7 @@
           </div>
 
           <div class="form-group">
-            <label for="script-cache" class="form-label">Cache</label>
+            <label for="script-cache" class="form-label" data-i18n="editorCacheLabel">Cache</label>
             <select id="script-cache" class="form-select">
               <option value="auto">auto</option>
               <option value="none">none</option>
@@ -95,13 +95,14 @@
       <!-- Instructions section -->
       <section class="instructions-section">
         <div class="section-header">
-          <h2 class="section-title">Instructions</h2>
-          <span id="lang-indicator" class="lang-indicator" hidden title="Language detected">🌐 Multi-language</span>
+          <h2 class="section-title" data-i18n="editorInstructionsTitle">Instructions</h2>
+          <span id="lang-indicator" class="lang-indicator" hidden data-i18n-title="editorLanguageDetectedTitle" title="Language detected" data-i18n="editorMultiLanguageIndicator">🌐 Multi-language</span>
           <span id="char-count" class="char-count">0 characters</span>
         </div>
         <textarea
           id="script-body"
           class="instructions-textarea"
+          data-i18n-placeholder="editorInstructionsPlaceholder"
           placeholder="Describe what this script should do in plain English...&#10;&#10;For example:&#10;- Hide the sidebar on the page&#10;- Change the background color to dark mode&#10;- Auto-click the &quot;Accept cookies&quot; button&#10;- Summarize the main article content and show it in an overlay"
         ></textarea>
       </section>
@@ -109,7 +110,7 @@
 
     <!-- Status bar -->
     <footer class="status-bar">
-      <span id="status-text" class="status-text">Ready</span>
+      <span id="status-text" class="status-text" data-i18n="editorStatusReady">Ready</span>
       <span id="status-chars" class="status-chars"></span>
     </footer>
 

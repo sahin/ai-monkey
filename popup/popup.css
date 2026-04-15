@@ -102,6 +102,12 @@ body::-webkit-scrollbar-thumb:hover {
   gap: 8px;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .monkey-emoji {
   font-size: 20px;
   line-height: 1;
@@ -120,6 +126,45 @@ body::-webkit-scrollbar-thumb:hover {
   background: var(--bg-surface);
   padding: 2px 8px;
   border-radius: 10px;
+}
+
+.language-picker {
+  display: inline-flex;
+}
+
+.language-select {
+  width: 92px;
+  height: 28px;
+  padding: 0 28px 0 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.language-select:focus {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---- Scripts Section ---- */
@@ -164,13 +209,37 @@ body::-webkit-scrollbar-thumb:hover {
   min-width: 0;
 }
 
+.script-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .script-name {
+  flex: 1;
+  min-width: 0;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.script-lang-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  flex-shrink: 0;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--accent-hover);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .script-pattern {
@@ -219,16 +288,16 @@ body::-webkit-scrollbar-thumb:hover {
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.toggle input:checked + .toggle-slider {
+.toggle input:checked+.toggle-slider {
   background: var(--accent);
 }
 
-.toggle input:checked + .toggle-slider::before {
+.toggle input:checked+.toggle-slider::before {
   transform: translateX(16px);
   background: #fff;
 }
 
-.toggle input:focus-visible + .toggle-slider {
+.toggle input:focus-visible+.toggle-slider {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
